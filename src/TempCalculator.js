@@ -3,12 +3,23 @@ import React, { Component } from 'react';
 class TempCalculator extends Component {
   constructor(props) {
     super(props);
-    this.state = { temp: 0 }
-    this.updateTemp = this.updateTemp.bind(this);
+    this.state = { tempCelcius: 0, tempFahrenheit: 32 }
+    this.updateCelciusTemp = this.updateCelciusTemp.bind(this);
+    this.updateFahrenheitTemp = this.updateFahrenheitTemp.bind(this);
   }
 
-  updateTemp(e) {
-    this.setState({temp: this.getTemp(e.target.value)})
+  updateCelciusTemp(e) {
+    this.setState({
+      tempCelcius: this.getTemp(e.target.value),
+      tempFahrenheit: this.getTemp(e.target.value) * 1.8 + 32
+    })
+  }
+
+  updateFahrenheitTemp(e) {
+    this.setState({
+      tempCelcius: (this.getTemp(e.target.value) - 32) / 1.8,
+      tempFahrenheit: this.getTemp(e.target.value),
+    })
   }
 
   getTemp(temp) {
@@ -16,14 +27,20 @@ class TempCalculator extends Component {
   }
 
   render() {
-    return <TempShow updateTemp={this.updateTemp} temp={this.state.temp}/>;
+    return (
+      <div>
+        <TempShow updateTemp={this.updateCelciusTemp} temp={this.state.tempCelcius} tempType='C' />
+        <TempShow updateTemp={this.updateFahrenheitTemp} temp={this.state.tempFahrenheit} tempType='F' />
+      </div>
+    );
   }
 }
 
 class TempShow extends Component {
   isBoiling() {
-    console.log("in!!!")
-    if (this.props.temp > 100) {
+    if (this.props.tempType === 'C' && this.props.temp >= 100) {
+      return true;
+    } else if (this.props.tempType === 'F' && this.props.temp >= 212) {
       return true;
     } else {
       return false;
@@ -35,6 +52,7 @@ class TempShow extends Component {
       <div>
         <BoilingShow boiling={this.isBoiling()} />
         <input value={this.props.temp} onChange={this.props.updateTemp}/>
+        <span>{this.props.tempType}</span>
       </div>
     );
   }
